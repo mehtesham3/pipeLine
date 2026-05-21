@@ -1,5 +1,5 @@
-import app from "../index.js";
 import { Pool } from "pg";
+import logger from "./logging.js";
 
 const pool = new Pool({
     user: "postgres",
@@ -10,11 +10,11 @@ const pool = new Pool({
 })
 
 pool.on("connect", () => {
-    console.log("Connected to the database");
+    logger.info("Connected to the database");
 })
 
 pool.on("error", (err) => {
-    console.log("Not connected to the database", err);
+    logger.error("Not connected to the database", err);
 })
 
 export default pool;
