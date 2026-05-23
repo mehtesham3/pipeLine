@@ -9,7 +9,7 @@ class AIService {
     constructor(config) {
         this.provider = config.provider.toLowerCase();
         this.adapter = this.initializeAdapter(this.provider, config);
-        logger.log('AIService initialized', {
+        logger.info('AIService initialized', {
             provider: this.provider,
             capabilities: this.adapter.getCapabilities()
         });
@@ -26,7 +26,8 @@ class AIService {
             case 'huggingface':
                 return new HuggingFaceAdapter(config);
             default:
-                throw new Error(`Unknow AI provider: ${provider}. Supported openai, gemini`);
+                logger.error('Unknow AI provider', { provider: provider })
+                throw new Error(`Unknow AI provider: ${provider}. Supported groq, google,nvidia,huggingface`);
         }
     }
 
@@ -41,6 +42,7 @@ class AIService {
             return await this.adapter.generateText(prompt, options);
         }
         catch (error) {
+            logger.error('Error generating text', { error: error, provider: this.provider });
             throw normalizeVendorError(error, this.provider);
         }
     }
@@ -56,12 +58,14 @@ class AIService {
         try {
             const capabilities = this.adapter.getCapabilities();
             if (!capabilities.supportsStreaming) {
+                logger.error('Streamming is not supported by this provider', { provider: this.provider });
                 throw new Error(`Streamming is not supported by ${this.provider}`);
             }
 
             return await this.adapter.generateTextStream(prompt, onChunk, options);
         }
         catch (error) {
+            logger.error('Error generating text stream', { error: error, provider: this.provider });
             throw normalizeVendorError(error, this.provider);
         }
     }

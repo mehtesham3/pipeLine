@@ -1,7 +1,7 @@
 import winston from "winston";
 
 const logger = winston.createLogger({
-    level: "http",
+    level: "debug",
     format: winston.format.combine(
         // winston.format.timestamp(),
         winston.format.json(),
@@ -18,8 +18,11 @@ const logger = winston.createLogger({
             )
         }),
         new winston.transports.Console({
-            level: "http",
-            format: winston.format.simple(),
+            level: "debug",
+            format: winston.format.combine(
+                winston.format.colorize(),
+                winston.format.simple()
+            ),
         })
     ],
 });

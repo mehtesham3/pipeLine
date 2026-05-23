@@ -6,7 +6,6 @@ class GeminiAdapter extends BaseAIAdapter {
     constructor(config) {
         super(config);
         this.validateConfig();
-
         this.clientSdk = new GoogleGenAI({ apiKey: this.config.apiKey });
         this.defaultModel = config.model || "gemini-2.5-flash";
     }
@@ -40,12 +39,20 @@ class GeminiAdapter extends BaseAIAdapter {
             model: model
         });
         const result = await this.clientSdk.models.generateContentStream({
-            contents: [{ role: "user", parts: [{ text: prompt }] }]
+            model: model,
+            contents: [{ role: "user", parts: [{ text: prompt }] }],
+            config: {
+                temperature: options.temperature || 0.7
+            }
         });
 
+        if (!result) {
+            throw new Error("Gemini stream initialization failed: No response from SDK.");
+        }
+
         let totalChunks = 0;
-        for await (const chunks of result.stream) {
-            const text = chunks.text();
+        for await (const chunks of result) {
+            const text = chunks.text;
             if (text) {
                 onChunk(text);
                 totalChunks++;

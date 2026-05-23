@@ -14,8 +14,8 @@ const aiConfig = {
         maxRetries
     },
     google: {
-        apiKey: apiKey || process.env.DEFAULT_API_KEY,
-        model: model || "gemini-3-flash-preview",
+        apiKey: process.env.DEFAULT_API_KEY,
+        model: model || "gemini-3.5-flash",
         timeout,
         maxRetries
     },
@@ -27,7 +27,7 @@ const aiConfig = {
     },
     huggingface: {
         apiKey,
-        model: model || "",
+        model: model || "meta-llama/Llama-3.1-8B-Instruct",
         timeout,
         maxRetries
     }

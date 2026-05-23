@@ -19,7 +19,7 @@ class NvidiaAdapter extends BaseAIAdapter {
     async generateText(prompt, options = {}) {
         const { model = this.defaultModel, maxTokens, temperature } = options;
 
-        logger.debug('OpenAI generateText called', { promptLenth: prompt.length, model: options.model || this.defaultModel });
+        logger.debug('NVIDIA generateText called', { promptLenth: prompt.length, model: options.model || this.defaultModel });
         const response = await this.clientSdk.chat.completions.create({
             model: options.model || this.defaultModel,
             messages: [
@@ -34,13 +34,13 @@ class NvidiaAdapter extends BaseAIAdapter {
         const text = response.choices[0].message.content;
         const usage = response.usage;
 
-        logger.debug('OpenAI response details', { model: response.model, tokenUsed: usage.total_tokens, promptTokens: usage.prompt_tokens, completionTokens: usage.completion_tokens });
+        logger.debug('NVIDIA response details', { model: response.model, tokenUsed: usage.total_tokens, promptTokens: usage.prompt_tokens, completionTokens: usage.completion_tokens });
 
         return text;
     }
 
     async generateTextStream(prompt, onChunk, options = {}) {
-        logger.debug('OpenAI generateTextStream called', {
+        logger.debug('NVIDIA generateTextStream called', {
             proomptLength: prompt.length
         });
 
@@ -64,7 +64,7 @@ class NvidiaAdapter extends BaseAIAdapter {
             }
         }
 
-        logger.log('OpenAI streaming complete', { totalChunks });
+        logger.info('\nNVIDIA streaming complete', { totalChunks });
     }
 
     getCapabilities() {
