@@ -1,7 +1,7 @@
 import { Queue } from "bullmq";
 import connection from "./redisConn.js";
 
-const myQueue = new Queue("pipeLineJobs",
+const txtGenerateQueue = new Queue("txtGenerate",
     {
         connection,
         defaultJobOptions: {
@@ -13,4 +13,14 @@ const myQueue = new Queue("pipeLineJobs",
     }
 );
 
-export default myQueue;
+export const emailSendQueue = new Queue("emailSend", {
+    connection,
+    defaultJobOptions: {
+        removeOnComplete: { age: 60 * 60 * 24 },
+        removeOnFail: { age: 60 * 60 * 24 * 7 },
+        attempts: 3,
+        backoff: { type: "exponential", delay: 3000 },
+    }
+});
+
+export default txtGenerateQueue

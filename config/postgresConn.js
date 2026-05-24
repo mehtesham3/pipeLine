@@ -1,20 +1,10 @@
-import { Pool } from "pg";
-import logger from "./logging.js";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client.js";
+import "dotenv/config"
 
-const pool = new Pool({
-    user: "postgres",
-    host: "localhost",
-    database: "pipeline",
-    password: "Angelica1!",
-    port: 5432
-})
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
-pool.on("connect", () => {
-    logger.info("Connected to the database");
-})
+console.log('DB URL starts with:', process.env.DATABASE_URL?.substring(0, 30));
 
-pool.on("error", (err) => {
-    logger.error("Not connected to the database", err);
-})
-
-export default pool;
+export default prisma;
