@@ -5,15 +5,21 @@ import logger from "./config/logging.js";
 import serverAdapter from "./config/monitorQ.js";
 import txtRouter from "./routes/txtGenerate.route.js";
 import prisma from "./config/postgresConn.js";
-
+import { createServer } from "http";
+import { initWebSocket } from "./config/socketConn.js";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 // Starting Worker
 import aiWorker from "./QueueArch/workers/aiWorker.js";
 import emailWorker from "./QueueArch/workers/emailWorker.js";
-import { createServer } from "http";
-import { initWebSocket } from "./config/socketConn.js";
 
 const app = express();
 app.use(express.json());
+app.use(cors({ origin: "*" }))
+// Serve static files from the 'public' folder
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const httpServer = createServer(app);
 initWebSocket(httpServer);
@@ -49,8 +55,9 @@ app.get("/status", async (req, res) => {
     res.json({ redis: redisStatus, postgres: postgresStatus, server: "running" });
 })
 
-app.listen(4000, () => {
+httpServer.listen(4000, () => {
     logger.info("Server health check at http://localhost:4000/status");
+    logger.info("WebSocket server running on port 4000");
 })
 
 export default app;

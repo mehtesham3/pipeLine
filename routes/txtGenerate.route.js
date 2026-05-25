@@ -1,15 +1,11 @@
 import express from "express";
 import addUniqueId from "../middelware/uniqueId.js";
 import generateTxt from "../controllers/txtGenerateSetup.js";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "../generated/prisma/client.js";
 import logger from "../config/logging.js";
 import "dotenv/config"
+import prisma from "../config/postgresConn.js";
 
 const txtRouter = express.Router();
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-const prisma = new PrismaClient({ adapter });
 
 txtRouter.post("/generate", addUniqueId, generateTxt);
 

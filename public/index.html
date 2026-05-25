@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI Content Pipeline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f6f9fc 0%, #eef2f5 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        /* main container */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* header */
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1a2a3f, #0f212e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .sub {
+            color: #4a627a;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2c7da0;
+            padding-left: 1rem;
+        }
+
+        /* card style */
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        /* generation panel */
+        .generator-panel {
+            padding: 1.8rem;
+            margin-bottom: 2.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: #1e2f3f;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #fff;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #2c7da0;
+            box-shadow: 0 0 0 3px rgba(44, 125, 160, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .row-2col {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .row-2col>div {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .btn {
+            background: #1f5068;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background: #2c7da0;
+        }
+
+        .btn-primary:hover {
+            background: #1f5e7a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #2c7da0;
+            color: #2c7da0;
+        }
+
+        .btn-outline:hover {
+            background: #eef7fc;
+        }
+
+        /* progress section */
+        .progress-section {
+            margin: 1.8rem 0 2rem;
+            background: #f8fafc;
+            border-radius: 28px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid #e2edf2;
+        }
+
+        .progress-bar-container {
+            background-color: #e2e8f0;
+            border-radius: 40px;
+            height: 10px;
+            overflow: hidden;
+            margin: 0.8rem 0 0.5rem;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #2c7da0, #61a5c2);
+            transition: width 0.25s ease;
+            border-radius: 40px;
+        }
+
+        .progress-message {
+            font-size: 0.85rem;
+            color: #2d3e50;
+            font-weight: 500;
+        }
+
+        .badge {
+            background: #eef2ff;
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1f5068;
+        }
+
+        /* cards grid */
+        .cards-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin: 1rem 0 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .refresh-btn {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            cursor: pointer;
+            color: #2c7da0;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.2rem;
+            transition: 0.2s;
+            border: 1px solid #eef2f8;
+        }
+
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-topic {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 0.8rem;
+            font-size: 0.75rem;
+            color: #5b6e82;
+            margin: 0.6rem 0;
+            flex-wrap: wrap;
+        }
+
+        .view-btn {
+            background: #eef2fa;
+            border: none;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #1f5068;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8fa4;
+        }
+
+        /* modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            border-radius: 32px;
+            padding: 1.8rem;
+            overflow-y: auto;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content pre {
+            background: #f4f8fc;
+            padding: 1rem;
+            border-radius: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        .close-modal {
+            float: right;
+            font-size: 1.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        footer {
+            margin-top: 3rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #8ba0b0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <h1>✨ AI Content Pipeline</h1>
+        <div class="sub">Generate blog posts / articles with AI, track progress live</div>
+
+        <!-- Generation form -->
+        <div class="card generator-panel">
+            <div class="row-2col">
+                <div class="form-group">
+                    <label>📝 Topic / Prompt</label>
+                    <textarea id="promptInput"
+                        placeholder="e.g., Explain microservices vs monolithic architecture"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>📧 Your Email</label>
+                    <input type="email" id="emailInput" placeholder="user@example.com" value="example@mail.com">
+                </div>
+            </div>
+            <div class="row-2col">
+                <div class="form-group">
+                    <label>🤖 AI Provider (optional)</label>
+                    <select id="providerSelect">
+                        <option value="">Default (server config)</option>
+                        <option value="nvidia">Nvidia AI</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="anthropic">Anthropic</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button id="generateBtn" class="btn btn-primary" style="width: 100%;">🚀 Generate &rarr;</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress tracking -->
+        <div class="progress-section">
+            <div style="display: flex; justify-content: space-between;">
+                <span><span class="badge">LIVE PROGRESS</span></span>
+                <span id="progressPercent" style="font-weight: 600;">0%</span>
+            </div>
+            <div class="progress-bar-container">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <div id="progressMsg" class="progress-message">✨ Waiting for generation to start...</div>
+        </div>
+
+        <!-- Results / history section -->
+        <div class="cards-header">
+            <h2 style="font-size: 1.5rem;">📚 Generated Content History</h2>
+            <button id="refreshHistoryBtn" class="refresh-btn" title="Refresh">↻ Refresh</button>
+        </div>
+        <div id="cardsContainer" class="cards-grid">
+            <div class="empty-state">Loading posts...</div>
+        </div>
+        <footer>⚡ Real-time WebSocket progress • AI queue via BullMQ • PostgreSQL persistence</footer>
+    </div>
+
+    <!-- Modal for full content -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="modalTitle">Full blog post</h3>
+            <div id="modalBody">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Socket.io client library -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // configuration
+        const API_BASE = 'http://localhost:4000';  // empty means same origin (adjust if needed)
+        let currentSocket = null;
+        let currentRequestId = null;
+
+
+        // DOM elements
+        const promptEl = document.getElementById('promptInput');
+        const emailEl = document.getElementById('emailInput');
+        const providerEl = document.getElementById('providerSelect');
+        const generateBtn = document.getElementById('generateBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressMsg = document.getElementById('progressMsg');
+        const progressPercentSpan = document.getElementById('progressPercent');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const refreshBtn = document.getElementById('refreshHistoryBtn');
+
+        // Modal
+        const modal = document.getElementById('detailModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const closeModalSpan = document.querySelector('.close-modal');
+
+        // Helper: reset progress UI
+        function resetProgressUI() {
+            progressFill.style.width = '0%';
+            progressPercentSpan.innerText = '0%';
+            progressMsg.innerText = '⚡ Waiting for generation...';
+        }
+
+        // Update progress bar (percent 0-100)
+        function updateProgress(percent, message) {
+            const p = Math.min(100, Math.max(0, percent));
+            progressFill.style.width = `${p}%`;
+            progressPercentSpan.innerText = `${p}%`;
+            if (message) progressMsg.innerText = message;
+        }
+
+        // disconnect previous socket and create new subscription
+        function subscribeToJob(requestId) {
+            if (currentSocket) {
+                currentSocket.disconnect();
+                currentSocket = null;
+            }
+            // connect to same origin websocket (socket.io)
+            const socket = io();
+            currentSocket = socket;
+
+            socket.on('connect', () => {
+                console.log('WebSocket connected, subscribing to job:', requestId);
+                socket.emit('subscribe:job', requestId);
+            });
+
+            socket.on('job:progress', (data) => {
+                console.log('Progress update:', data);
+                // data format: { percent, message } or { percent, message }
+                if (data && typeof data.percent === 'number') {
+                    updateProgress(data.percent, data.message || `Progress: ${data.percent}%`);
+                    if (data.percent >= 100) {
+                        progressMsg.innerText = '✅ Content ready! Email sent (simulated). Refreshing history...';
+                        fetchAllPosts();  // refresh the list to show new entry
+                        // Optional: close socket after finish, but keep for next generation
+                        setTimeout(() => {
+                            if (currentSocket) currentSocket.disconnect();
+                            currentSocket = null;
+                        }, 3000);
+                    }
+                } else if (data && data.percent === undefined && data.message) {
+                    progressMsg.innerText = data.message;
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log('WebSocket disconnected');
+            });
+
+            socket.on('connect_error', (err) => {
+                console.warn('WebSocket connection error', err);
+                progressMsg.innerText = '⚠️ Realtime updates unavailable, check console.';
+            });
+        }
+
+        // POST /generate
+        async function triggerGeneration(topic, email, provider) {
+            const payload = { prompt: topic, email };
+            if (provider) payload.provider = provider;
+
+            try {
+                const response = await fetch(`${API_BASE}/generate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                });
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errText}`);
+                }
+                const data = await response.json();
+                if (data.requestId) {
+                    currentRequestId = data.requestId;
+                    resetProgressUI();
+                    progressMsg.innerText = `⏳ Generation queued (ID: ${data.requestId.substring(0, 8)}). Connecting live updates...`;
+                    subscribeToJob(data.requestId);
+                    return true;
+                } else {
+                    throw new Error('No requestId in response');
+                }
+            } catch (err) {
+                console.error('Generation error:', err);
+                progressMsg.innerText = `❌ Failed to start: ${err.message}`;
+                return false;
+            }
+        }
+
+        // fetch all posts from /seeAll
+        async function fetchAllPosts() {
+            try {
+                const res = await fetch(`${API_BASE}/seeAll`);
+                if (!res.ok) throw new Error('Failed to fetch history');
+                const json = await res.json();
+                let posts = json.data || [];
+                if (!Array.isArray(posts)) posts = [];
+                renderCards(posts);
+            } catch (err) {
+                console.error(err);
+                cardsContainer.innerHTML = `<div class="empty-state">⚠️ Could not load history: ${err.message}</div>`;
+            }
+        }
+
+        // render card list
+        function renderCards(posts) {
+            if (!posts.length) {
+                cardsContainer.innerHTML = `<div class="empty-state">📭 No generated posts yet. Create your first one above!</div>`;
+                return;
+            }
+            const html = posts.map(post => `
+            <div class="result-card" data-requestid="${post.requestId}">
+                <div class="card-topic">${escapeHtml(post.topic)}</div>
+                <div class="card-meta">
+                    <span>🔧 ${escapeHtml(post.provider)}</span>
+                    <span>📅 ${new Date(post.createdAt).toLocaleDateString()}</span>
+                    <span>🏷️ ${escapeHtml(post.status)}</span>
+                </div>
+                <button class="view-btn" data-requestid="${post.id}">📖 View Full Content</button>
+            </div>
+        `).join('');
+            cardsContainer.innerHTML = html;
+
+            // attach event listeners to "View" buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const requestId = btn.getAttribute('data-requestid');
+                    if (requestId) fetchFullContent(requestId);
+                });
+            });
+        }
+
+        // fetch full content via /content/:requestId
+        async function fetchFullContent(requestId) {
+            modal.style.display = 'flex';
+            modalBody.innerHTML = '<div class="empty-state">Loading content...</div>';
+            modalTitle.innerText = 'Loading...';
+            try {
+                const res = await fetch(`${API_BASE}/content/${requestId}`);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const json = await res.json();
+                const data = json.data;
+                if (!data) throw new Error('No data in response');
+                modalTitle.innerText = `📄 ${data.topic.substring(0, 70)}`;
+                modalBody.innerHTML = `
+                <div style="margin-bottom: 1rem;"><strong>Provider:</strong> ${escapeHtml(data.provider)} &nbsp;|&nbsp;
+                <strong>Status:</strong> ${escapeHtml(data.status)} &nbsp;|&nbsp;
+                <strong>Created:</strong> ${new Date(data.createdAt).toLocaleString()}</div>
+                <hr style="margin: 0.7rem 0;">
+                <div style="white-space: pre-wrap; line-height: 1.5;">${escapeHtml(data.content)}</div>
+                <div style="margin-top: 1rem; font-size: 0.7rem; color: #6f8faa;">Request ID: ${data.requestId}</div>
+            `;
+            } catch (err) {
+                modalBody.innerHTML = `<div class="empty-state">❌ Error: ${err.message}</div>`;
+            }
+        }
+
+        // simple XSS escape
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function (m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function (c) {
+                return c;
+            });
+        }
+
+        // handle generation button click
+        async function onGenerate() {
+            const prompt = promptEl.value.trim();
+            const email = emailEl.value.trim();
+            if (!prompt) {
+                alert('Please enter a topic / prompt');
+                return;
+            }
+            if (!email || !email.includes('@')) {
+                alert('Valid email is required');
+                return;
+            }
+            const provider = providerEl.value;
+
+            generateBtn.disabled = true;
+            generateBtn.innerText = '⏳ Queuing...';
+            resetProgressUI();
+            progressMsg.innerText = '⏳ Sending request...';
+
+            const success = await triggerGeneration(prompt, email, provider);
+            if (!success) {
+                generateBtn.disabled = false;
+                generateBtn.innerText = '🚀 Generate';
+            } else {
+                // keep disabled for short time, but user can refresh history manually
+                setTimeout(() => {
+                    generateBtn.disabled = false;
+                    generateBtn.innerText = '🚀 Generate';
+                }, 2000);
+            }
+            // optionally clear prompt? Not clearing to allow edits
+        }
+
+        // event listeners
+        generateBtn.addEventListener('click', onGenerate);
+        refreshBtn.addEventListener('click', () => {
+            fetchAllPosts();
+            progressMsg.innerText = '🔄 History refreshed.';
+        });
+
+        // modal close
+        closeModalSpan.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+
+        // initial load
+        fetchAllPosts();
+
+        // optional: if the user leaves the page, disconnect socket
+        window.addEventListener('beforeunload', () => {
+            if (currentSocket) currentSocket.disconnect();
+        });
+    </script>
+</body>
+
+</html>

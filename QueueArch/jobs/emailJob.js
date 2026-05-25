@@ -6,7 +6,7 @@ export async function emailSend(job) {
     try {
         emitProgress(requestId, 75, 'Sending email...');
         await sendEmail(to, subject, text);
-        if (Math.random() < 0.8) {  //80% chance of failure
+        if (Math.random() < 0.3) {  //30% chance of failure
             throw new Error('Email failed');
         }
         emitProgress(requestId, 100, 'Email sent successfully');

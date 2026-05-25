@@ -1,15 +1,8 @@
-import { PrismaPg } from "@prisma/adapter-pg";
 import { createAIService } from "../../aiSetup.js";
 import logger from "../../config/logging.js";
-import { PrismaClient } from "../../generated/prisma/client.js";
 import emitProgress from "../../config/socketConn.js";
 import { emailSendQueue } from "../../config/queueCon.js";
-
-const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
-
-const prisma = new PrismaClient({
-    adapter
-});
+import prisma from "../../config/postgresConn.js";
 
 async function saveToDB(data) {
     const { prompt, content, provider, status, requestId, userEmail } = data;

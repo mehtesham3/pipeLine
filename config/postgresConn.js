@@ -5,6 +5,4 @@ import "dotenv/config"
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
-console.log('DB URL starts with:', process.env.DATABASE_URL?.substring(0, 30));
-
 export default prisma;

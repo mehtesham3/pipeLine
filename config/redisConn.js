@@ -5,7 +5,15 @@ const connection = new Redis({
     host: "localhost",
     port: 6379,
     maxRetriesPerRequest: 0,
-    enableReadyCheck: false
+    enableReadyCheck: false,
+    lazyConnect: true,
+    retryStrategy: (times) => {
+        if (times > 8) {
+            logger.error("Redis is not connected after 8 retries");
+            return null;
+        }
+        return Math.min(times * 50, 2000);
+    }
 
 });
 
