@@ -19,6 +19,57 @@ The **AI Content Pipeline** is designed to handle high-throughput, asynchronous 
 * **Robust background queues** powered by **BullMQ** & **Redis** with automated retries and task separation.
 * **PostgreSQL Database Storage** powered by **Prisma ORM**.
 * **Modern aesthetic dashboard** serving static files locally.
+* **BullMQ Admin Dashboard**: Built-in real-time task monitoring at `/admin/queues`.
+* **Structured Logging & Diagnostics**: Multi-transport server/job execution logs powered by **Winston**.
+
+---
+
+## 📸 Visual Preview & Screenshots
+
+Here is a visual walk-through of the **AI Content Pipeline** in action:
+
+<table align="center" width="100%">
+  <tr>
+    <td align="center" width="50%">
+      <b>🖥️ Modern Aesthetic Dashboard</b>
+      <br/>
+      <i>The interactive client UI where users submit generation requests and track status.</i>
+      <br/><br/>
+      <img src="images/frontend-ui.png" alt="Frontend UI Dashboard" width="100%" style="border-radius: 8px; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    </td>
+    <td align="center" width="50%">
+      <b>✨ Generated Content Display</b>
+      <br/>
+      <i>Real-time streaming completes, rendering the beautiful fully generated blog post.</i>
+      <br/><br/>
+      <img src="images/Generated-Content.png" alt="Generated Content View" width="100%" style="border-radius: 8px; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <b>📊 BullMQ Job & Queue Monitor</b>
+      <br/>
+      <i>Admin interface for tracking active, delayed, completed, and failed tasks.</i>
+      <br/><br/>
+      <img src="images/bullDashboard.png" alt="BullMQ Monitoring Dashboard" width="100%" style="border-radius: 8px; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    </td>
+    <td align="center" width="50%">
+      <b>📄 Clean Structured API Response</b>
+      <br/>
+      <i>Instant 202 Accepted response containing the tracking UUID.</i>
+      <br/><br/>
+      <img src="images/OutputResponse.png" alt="Output API Response" width="100%" style="border-radius: 8px; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <b>📟 Server Execution & Event Logging</b>
+  <br/>
+  <i>Detailed multi-transport logging via Winston showing server initiation and job flows.</i>
+  <br/><br/>
+  <img src="images/logs.png" alt="Server Execution Logs" width="85%" style="border-radius: 8px; border: 1px solid #e1e4e8; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" />
+</p>
 
 ---
 
@@ -141,6 +192,7 @@ cd pipeLine
 6. **Verify Server is Running**:
    Open your browser and visit:
    - **Dashboard UI**: [http://localhost:4000](http://localhost:4000)
+   - **BullMQ Admin Monitor**: [http://localhost:4000/admin/queues](http://localhost:4000/admin/queues)
    - **Health Check Endpoint**: [http://localhost:4000/status](http://localhost:4000/status)
 
 ---

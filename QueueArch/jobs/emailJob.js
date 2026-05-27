@@ -3,10 +3,11 @@ import emitProgress from "../../config/socketConn.js";
 
 export async function emailSend(job) {
     const { to, subject, text, requestId } = job.data;
+    logger.info("Email Job started for request ID: ", job.data.requestId);
     try {
         emitProgress(requestId, 75, 'Sending email...');
         await sendEmail(to, subject, text);
-        if (Math.random() < 0.3) {  //30% chance of failure
+        if (Math.random() < 0.6) {  //60% chance of failure
             throw new Error('Email failed');
         }
         emitProgress(requestId, 100, 'Email sent successfully');

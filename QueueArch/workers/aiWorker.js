@@ -5,9 +5,9 @@ import logger from "../../config/logging.js";
 
 const aiWorker = new Worker("txtGenerate", async (job) => {
     const { data } = job;
-    logger.info("AI related Job started for request ID: ", data.requestId);
+    logger.info("AI Job started for request ID: ", job.data.requestId);
     await txtGenerate(data);
-}, { connection, concurrency: 2, name: 'Ai Worker' }
+}, { connection, concurrency: 2, name: 'AI Worker' }
 )
 
 aiWorker.on('completed', (job) => {
